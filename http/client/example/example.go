@@ -42,7 +42,7 @@ func main() {
 	ctx = context.WithValue(ctx, "foo", "bar")
 
 	res, err := cli.Get(ctx, client.HTTPRequest{
-		URL: "http://localhost:8080/ping",
+		URL: "http://localhost:8080/error",
 	})
 	if err != nil {
 		logger.Error(ctx, errors.New("can't call Server").WithRootError(err))
