@@ -7,6 +7,69 @@ import (
 	"github.com/trivelaapp/go-kit/env"
 )
 
+func TestGetEnvironmentByLabel(t *testing.T) {
+	tt := []struct {
+		desc  string
+		input string
+		env   env.Environment
+	}{
+		{
+			desc:  "should be Dev #1",
+			input: "development",
+			env:   env.DevelopmentEnvironment,
+		},
+		{
+			desc:  "should be Dev #2",
+			input: "dev",
+			env:   env.DevelopmentEnvironment,
+		},
+		{
+			desc:  "should be Dev #3",
+			input: "DEVELOPMENT",
+			env:   env.DevelopmentEnvironment,
+		},
+		{
+			desc:  "should be Test #1",
+			input: "test",
+			env:   env.TestEnvironment,
+		},
+		{
+			desc:  "should be Test #2",
+			input: "homolog",
+			env:   env.TestEnvironment,
+		},
+		{
+			desc:  "should be Test #3",
+			input: "staging",
+			env:   env.TestEnvironment,
+		},
+		{
+			desc:  "should be Prod #1",
+			input: "production",
+			env:   env.ProductionEnvironment,
+		},
+		{
+			desc:  "should be Prod #2",
+			input: "prod",
+			env:   env.ProductionEnvironment,
+		},
+		{
+			desc:  "should be Prod #3",
+			input: "PROD",
+			env:   env.ProductionEnvironment,
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.desc, func(t *testing.T) {
+			e := env.GetEnvironmentByLabel(tc.input)
+			if e != tc.env {
+				t.Errorf("Mismatch response, got %d", e)
+			}
+		})
+	}
+}
+
 func TestGetString(t *testing.T) {
 	envs := map[string]string{
 		"FAKE_ENV_1": "fake-env-1",
