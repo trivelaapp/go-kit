@@ -1,0 +1,8 @@
+name: Pull Request Workflow
+
+on: pull_request
+
+jobs:
+  unit_test:
+    name: Unit Test
+    uses: trivelaapp/go-kit/.github/workflows/unit_test.yaml@main

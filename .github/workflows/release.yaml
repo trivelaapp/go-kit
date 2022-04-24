@@ -5,9 +5,13 @@ on:
     branches: [main, beta]
 
 jobs:
+  unit_test:
+    name: Unit Test
+    uses: trivelaapp/go-kit/.github/workflows/unit_test.yaml@main
   versioning:
     name: Define next release version
     runs-on: ubuntu-20.04
+    needs: unit_test
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
