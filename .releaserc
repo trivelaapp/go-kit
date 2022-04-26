@@ -1,12 +1,24 @@
----
-branches:
-  - name: main
-  - name: beta
-    prerelease: true
-
-extends: semantic-release-monorepo
-
-plugins:
-  - "@semantic-release/commit-analyzer"
-  - "@semantic-release/release-notes-generator"
-  - "@semantic-release/github"
+{
+  "branches": [
+    { "name": "main" },
+    { "name": "beta", "prerelease": true }
+  ],
+  "extends": "semantic-release-monorepo",
+  "plugins": [
+    [
+      "@semantic-release/commit-analyzer",
+      {
+        "preset": "angular",
+        "releaseRules": [
+          {"type": "ci", "release": "patch"},
+          {"type": "build", "release": "patch"},
+          {"type": "docs", "release": "patch"},
+          {"type": "test", "release": "patch"},
+          {"type": "refactor", "release": "patch"},
+          {"scope": "no-release", "release": false}
+        ]
+      }
+    ],
+    "@semantic-release/release-notes-generator"
+  ]
+}
