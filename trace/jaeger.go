@@ -9,8 +9,8 @@ import (
 	"github.com/trivelaapp/go-kit/errors"
 )
 
-// JaegerClientParams encapsulates the necessary parameters to initialize a JaegerClient.
-type JaegerClientParams struct {
+// JaegerTracerProviderParams encapsulates the necessary parameters to initialize a JaegerTracerProvider.
+type JaegerTracerProviderParams struct {
 	ApplicationName    string
 	ApplicationVersion string
 	Endpoint           string
@@ -22,16 +22,16 @@ type JaegerClientParams struct {
 	TraceRatio float64
 }
 
-// JaegerClient creates Trace tracers.
-type JaegerClient struct {
+// JaegerTracerProvider creates Jaeger tracers.
+type JaegerTracerProvider struct {
 	applicationName    string
 	applicationVersion string
 	endpoint           string
 	traceRatio         float64
 }
 
-// NewJaegerClient create a new instance of a JaegerClient.
-func NewJaegerClient(params JaegerClientParams) (TraceProvider, error) {
+// NewJaegerTracerProvider create a new instance of a JaegerTracerProvider.
+func NewJaegerTracerProvider(params JaegerTracerProviderParams) (TracerProvider, error) {
 	if params.ApplicationName == "" {
 		return nil, errors.NewMissingRequiredDependency("ApplicationName")
 	}
@@ -44,7 +44,7 @@ func NewJaegerClient(params JaegerClientParams) (TraceProvider, error) {
 		return nil, errors.NewMissingRequiredDependency("Endpoint")
 	}
 
-	return &JaegerClient{
+	return &JaegerTracerProvider{
 		applicationName:    params.ApplicationName,
 		applicationVersion: params.ApplicationVersion,
 		endpoint:           params.Endpoint,
@@ -52,10 +52,10 @@ func NewJaegerClient(params JaegerClientParams) (TraceProvider, error) {
 	}, nil
 }
 
-// MustNewJaegerClient create a new instance of a JaegerClient.
+// MustNewJaegerTracerProvider create a new instance of a JaegerTracerProvider.
 // It panics if any error is found.
-func MustNewJaegerClient(params JaegerClientParams) TraceProvider {
-	client, err := NewJaegerClient(params)
+func MustNewJaegerTracerProvider(params JaegerTracerProviderParams) TracerProvider {
+	client, err := NewJaegerTracerProvider(params)
 	if err != nil {
 		panic(err)
 	}
@@ -63,9 +63,9 @@ func MustNewJaegerClient(params JaegerClientParams) TraceProvider {
 	return client
 }
 
-// Tracer produces a new Trace tracer and a Flush function.
+// Tracer produces a new Jaeger tracer and a Flush function.
 // The flush function is designed to flush all pending tracer into provider. Usually used during application's shutdown.
-func (c JaegerClient) Tracer(ctx context.Context) (trace.Tracer, func(context.Context) error, error) {
+func (c JaegerTracerProvider) Tracer(ctx context.Context) (trace.Tracer, func(context.Context) error, error) {
 	jaegerExporter, err := jaeger.New(jaeger.WithCollectorEndpoint(jaeger.WithEndpoint(c.endpoint)))
 	if err != nil {
 		return nil, nil, errors.New("can't initialize Jaeger exporter").WithRootError(err)

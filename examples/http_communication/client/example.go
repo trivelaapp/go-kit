@@ -22,7 +22,7 @@ func main() {
 		},
 	})
 
-	trace := trace.MustNewJaegerClient(trace.JaegerClientParams{
+	trace := trace.MustNewJaegerTracerProvider(trace.JaegerTracerProviderParams{
 		ApplicationName:    applicationName,
 		ApplicationVersion: "v0.0.0",
 		Endpoint:           "http://localhost:14268/api/traces",

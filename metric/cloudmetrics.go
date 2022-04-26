@@ -13,24 +13,24 @@ import (
 	"github.com/trivelaapp/go-kit/errors"
 )
 
-// CloudMetricsClientParams encapsulates the necessary parameters to initialize a CloudMetricsClient.
-type CloudMetricsClientParams struct {
+// CloudMetricsMeterProviderParams encapsulates the necessary parameters to initialize a CloudMetricsMeterProvider.
+type CloudMetricsMeterProviderParams struct {
 	ApplicationName    string
 	ApplicationVersion string
 	ProjectID          string
 	Logger             logger
 }
 
-// CloudMetricsClient creates Metric meters.
-type CloudMetricsClient struct {
+// CloudMetricsMeterProvider creates Metric meters.
+type CloudMetricsMeterProvider struct {
 	applicationName    string
 	applicationVersion string
 	projectID          string
 	logger             logger
 }
 
-// NewCloudMetricsClient create a new instance of a CloudMetricsClient.
-func NewCloudMetricsClient(params CloudMetricsClientParams) (*CloudMetricsClient, error) {
+// NewCloudMetricsMeterProvider create a new instance of a CloudMetricsMeterProvider.
+func NewCloudMetricsMeterProvider(params CloudMetricsMeterProviderParams) (MeterProvider, error) {
 	if params.ApplicationName == "" {
 		return nil, errors.NewMissingRequiredDependency("ApplicationName")
 	}
@@ -47,7 +47,7 @@ func NewCloudMetricsClient(params CloudMetricsClientParams) (*CloudMetricsClient
 		return nil, errors.NewMissingRequiredDependency("Logger")
 	}
 
-	return &CloudMetricsClient{
+	return &CloudMetricsMeterProvider{
 		applicationName:    params.ApplicationName,
 		applicationVersion: params.ApplicationVersion,
 		projectID:          params.ProjectID,
@@ -55,10 +55,10 @@ func NewCloudMetricsClient(params CloudMetricsClientParams) (*CloudMetricsClient
 	}, nil
 }
 
-// MustNewCloudMetricsClient create a new instance of a CloudMetricsClient.
+// MustNewCloudMetricsMeterProvider create a new instance of a CloudMetricsMeterProvider.
 // It panics if any error is found.
-func MustNewCloudMetricsClient(params CloudMetricsClientParams) *CloudMetricsClient {
-	client, err := NewCloudMetricsClient(params)
+func MustNewCloudMetricsMeterProvider(params CloudMetricsMeterProviderParams) MeterProvider {
+	client, err := NewCloudMetricsMeterProvider(params)
 	if err != nil {
 		panic(err)
 	}
@@ -68,7 +68,7 @@ func MustNewCloudMetricsClient(params CloudMetricsClientParams) *CloudMetricsCli
 
 // Meter produces a new CloudMetrics meter.
 // The produced Meter pushes metrics to Cloud Metrics every 30 seconds.
-func (c CloudMetricsClient) Meter(ctx context.Context) (metric.Meter, func(context.Context) error, error) {
+func (c CloudMetricsMeterProvider) Meter(ctx context.Context) (metric.Meter, func(context.Context) error, error) {
 	opts := []mexporter.Option{
 		mexporter.WithProjectID(c.projectID),
 		mexporter.WithOnError(func(err error) {

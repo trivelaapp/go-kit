@@ -19,24 +19,24 @@ import (
 	"github.com/trivelaapp/go-kit/errors"
 )
 
-// PrometheusClientParams encapsulates the necessary parameters to initialize a PrometheusClient.
-type PrometheusClientParams struct {
+// PrometheusMeterProviderParams encapsulates the necessary parameters to initialize a PrometheusMeterProvider.
+type PrometheusMeterProviderParams struct {
 	ApplicationName     string
 	ApplicationVersion  string
 	MetricsServerPort   int
 	HistogramBoundaries []float64
 }
 
-// PrometheusClient creates Metric meters.
-type PrometheusClient struct {
+// PrometheusMeterProvider creates Metric meters.
+type PrometheusMeterProvider struct {
 	applicationName     string
 	applicationVersion  string
 	metricsServerPort   int
 	histogramBoundaries []float64
 }
 
-// NewPrometheusClient create a new instance of a PrometheusClient.
-func NewPrometheusClient(params PrometheusClientParams) (*PrometheusClient, error) {
+// NewPrometheusMeterProvider create a new instance of a PrometheusMeterProvider.
+func NewPrometheusMeterProvider(params PrometheusMeterProviderParams) (MeterProvider, error) {
 	if params.ApplicationName == "" {
 		return nil, errors.NewMissingRequiredDependency("ApplicationName")
 	}
@@ -53,7 +53,7 @@ func NewPrometheusClient(params PrometheusClientParams) (*PrometheusClient, erro
 		return nil, errors.NewMissingRequiredDependency("HistogramBoundaries")
 	}
 
-	return &PrometheusClient{
+	return &PrometheusMeterProvider{
 		applicationName:     params.ApplicationName,
 		applicationVersion:  params.ApplicationVersion,
 		metricsServerPort:   params.MetricsServerPort,
@@ -61,10 +61,10 @@ func NewPrometheusClient(params PrometheusClientParams) (*PrometheusClient, erro
 	}, nil
 }
 
-// MustNewPrometheusClient create a new instance of a PrometheusClient.
+// MustNewPrometheusMeterProvider create a new instance of a PrometheusMeterProvider.
 // It panics if any error is found.
-func MustNewPrometheusClient(params PrometheusClientParams) *PrometheusClient {
-	client, err := NewPrometheusClient(params)
+func MustNewPrometheusMeterProvider(params PrometheusMeterProviderParams) MeterProvider {
+	client, err := NewPrometheusMeterProvider(params)
 	if err != nil {
 		panic(err)
 	}
@@ -73,7 +73,8 @@ func MustNewPrometheusClient(params PrometheusClientParams) *PrometheusClient {
 }
 
 // Meter produces a new Prometheus meter.
-func (c PrometheusClient) Meter(ctx context.Context) (metric.Meter, error) {
+// Its flush function doesn't do anything, since it works in a Pull model.
+func (c PrometheusMeterProvider) Meter(ctx context.Context) (metric.Meter, func(context.Context) error, error) {
 	config := prometheus.Config{
 		DefaultHistogramBoundaries: c.histogramBoundaries,
 	}
@@ -97,7 +98,7 @@ func (c PrometheusClient) Meter(ctx context.Context) (metric.Meter, error) {
 
 	exporter, err := prometheus.New(config, controller)
 	if err != nil {
-		return nil, errors.New("failed to initialize prometheus exporter").WithRootError(err)
+		return nil, nil, errors.New("failed to initialize prometheus exporter").WithRootError(err)
 	}
 
 	meterProvider := exporter.MeterProvider()
@@ -108,5 +109,5 @@ func (c PrometheusClient) Meter(ctx context.Context) (metric.Meter, error) {
 		http.ListenAndServe(fmt.Sprintf(":%d", c.metricsServerPort), nil)
 	}()
 
-	return meterProvider.Meter(c.applicationName), nil
+	return meterProvider.Meter(c.applicationName), func(context.Context) error { return nil }, nil
 }

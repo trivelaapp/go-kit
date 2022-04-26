@@ -9,8 +9,8 @@ import (
 	"github.com/trivelaapp/go-kit/errors"
 )
 
-// CloudTraceClientParams encapsulates the necessary parameters to initialize a CloudTraceClient.
-type CloudTraceClientParams struct {
+// CloudTraceTracerProviderParams encapsulates the necessary parameters to initialize a CloudTraceTracerProvider.
+type CloudTraceTracerProviderParams struct {
 	ApplicationName    string
 	ApplicationVersion string
 	ProjectID          string
@@ -22,16 +22,16 @@ type CloudTraceClientParams struct {
 	TraceRatio float64
 }
 
-// CloudTraceClient creates CloudTrace tracers.
-type CloudTraceClient struct {
+// CloudTraceTracerProvider creates CloudTrace tracers.
+type CloudTraceTracerProvider struct {
 	applicationName    string
 	applicationVersion string
 	projectID          string
 	traceRatio         float64
 }
 
-// NewCloudTraceClient create a new instance of a CloudTraceClient.
-func NewCloudTraceClient(params CloudTraceClientParams) (TraceProvider, error) {
+// NewCloudTraceTracerProvider create a new instance of a CloudTraceTracerProvider.
+func NewCloudTraceTracerProvider(params CloudTraceTracerProviderParams) (TracerProvider, error) {
 	if params.ApplicationName == "" {
 		return nil, errors.NewMissingRequiredDependency("ApplicationName")
 	}
@@ -44,7 +44,7 @@ func NewCloudTraceClient(params CloudTraceClientParams) (TraceProvider, error) {
 		return nil, errors.NewMissingRequiredDependency("ProjectID")
 	}
 
-	return &CloudTraceClient{
+	return &CloudTraceTracerProvider{
 		applicationName:    params.ApplicationName,
 		applicationVersion: params.ApplicationVersion,
 		projectID:          params.ProjectID,
@@ -52,10 +52,10 @@ func NewCloudTraceClient(params CloudTraceClientParams) (TraceProvider, error) {
 	}, nil
 }
 
-// MustNewCloudTraceClient create a new instance of a CloudTraceClient.
+// MustNewCloudTraceTracerProvider create a new instance of a CloudTraceTracerProvider.
 // It panics if any error is found.
-func MustNewCloudTraceClient(params CloudTraceClientParams) TraceProvider {
-	client, err := NewCloudTraceClient(params)
+func MustNewCloudTraceTracerProvider(params CloudTraceTracerProviderParams) TracerProvider {
+	client, err := NewCloudTraceTracerProvider(params)
 	if err != nil {
 		panic(err)
 	}
@@ -63,9 +63,9 @@ func MustNewCloudTraceClient(params CloudTraceClientParams) TraceProvider {
 	return client
 }
 
-// Tracer produces a new Trace tracer and a Flush function.
+// Tracer produces a new CloudTrace tracer and a Flush function.
 // The flush function is designed to flush all pending tracer into provider. Usually used during application's shutdown.
-func (c CloudTraceClient) Tracer(ctx context.Context) (trace.Tracer, func(context.Context) error, error) {
+func (c CloudTraceTracerProvider) Tracer(ctx context.Context) (trace.Tracer, func(context.Context) error, error) {
 	exporter, err := texporter.New(texporter.WithProjectID(c.projectID))
 	if err != nil {
 		return nil, nil, errors.New("can't initialize CloudTrace exporter").WithRootError(err)

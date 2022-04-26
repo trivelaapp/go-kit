@@ -22,7 +22,7 @@ func main() {
 		Level: "INFO",
 	})
 
-	trace := trace.MustNewJaegerClient(trace.JaegerClientParams{
+	trace := trace.MustNewJaegerTracerProvider(trace.JaegerTracerProviderParams{
 		ApplicationName:    applicationName,
 		ApplicationVersion: "v0.0.0",
 		Endpoint:           "http://localhost:14268/api/traces",
@@ -34,13 +34,13 @@ func main() {
 	}
 	defer flush(ctx)
 
-	metric := metric.MustNewPrometheusClient(metric.PrometheusClientParams{
+	metric := metric.MustNewPrometheusMeterProvider(metric.PrometheusMeterProviderParams{
 		ApplicationName:     applicationName,
 		ApplicationVersion:  "v0.0.0",
 		MetricsServerPort:   8081,
 		HistogramBoundaries: []float64{1, 2, 5, 10, 20, 50},
 	})
-	if _, err := metric.Meter(ctx); err != nil {
+	if _, _, err := metric.Meter(ctx); err != nil {
 		logger.Panic(ctx, err)
 	}
 
