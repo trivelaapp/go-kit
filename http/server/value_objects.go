@@ -30,8 +30,7 @@ type errorResponse struct {
 	Err     errorPayload `json:"error"`
 }
 
-// NewErrorResponse creates a new HTTP error response in accordance with Trivela's standards.
-func NewErrorResponse(ctx context.Context, err error) errorResponse {
+func newErrorResponse(ctx context.Context, err error) errorResponse {
 	return errorResponse{
 		TraceID: getTraceID(trace.SpanFromContext(ctx)),
 		status:  kindToHTTPStatusCode(errors.Kind(err)),

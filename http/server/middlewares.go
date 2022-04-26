@@ -106,7 +106,7 @@ func ErrorHandler(ctx *gin.Context) {
 	}
 
 	if len(ctx.Errors) == 1 {
-		res := NewErrorResponse(ctx, ctx.Errors[0].Err)
+		res := newErrorResponse(ctx, ctx.Errors[0].Err)
 		ctx.JSON(res.StatusCode(), res)
 		return
 	}
