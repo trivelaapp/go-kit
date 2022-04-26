@@ -6,6 +6,10 @@ import (
 	"fmt"
 	"os"
 	"time"
+
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/metric/global"
+	"go.opentelemetry.io/otel/metric/instrument/syncint64"
 )
 
 // Level indicates the severity of the data being logged.
@@ -104,14 +108,14 @@ func (l Logger) Warning(ctx context.Context, msg string, args ...interface{}) {
 	}
 }
 
-// Error logs error data.
+// Error logs error data. It increases error counter metrics.
 func (l Logger) Error(ctx context.Context, err error) {
 	if l.level >= LevelError {
 		l.printError(ctx, err, LevelError)
 	}
 }
 
-// Critical logs critical data.
+// Critical logs critical data. It increases error counter metrics.
 func (l Logger) Critical(ctx context.Context, err error) {
 	if l.level >= LevelCritical {
 		l.printError(ctx, err, LevelCritical)
@@ -157,4 +161,25 @@ func (l Logger) printError(ctx context.Context, err error, level Level) {
 
 	data, _ := json.Marshal(payload)
 	fmt.Println(string(data))
+
+	counter := errorCounter()
+	if counter != nil {
+		counter.Add(ctx, 1, attribute.String("level", level.String()))
+	}
+}
+
+var errCounter syncint64.Counter
+
+func errorCounter() syncint64.Counter {
+	if errCounter != nil {
+		return errCounter
+	}
+
+	counter, err := global.Meter("trivelaapp.go-kit.errors").SyncInt64().Counter("app.error_counter")
+	if err != nil {
+		return nil
+	}
+
+	errCounter = counter
+	return counter
 }

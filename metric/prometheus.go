@@ -2,10 +2,12 @@ package metric
 
 import (
 	"context"
-	"log"
+	"fmt"
+	"net/http"
 
 	"go.opentelemetry.io/otel/exporters/prometheus"
 	"go.opentelemetry.io/otel/metric"
+	"go.opentelemetry.io/otel/metric/global"
 	"go.opentelemetry.io/otel/sdk/metric/aggregator/histogram"
 	controller "go.opentelemetry.io/otel/sdk/metric/controller/basic"
 	"go.opentelemetry.io/otel/sdk/metric/export/aggregation"
@@ -95,18 +97,16 @@ func (c PrometheusClient) Meter(ctx context.Context) (metric.Meter, error) {
 
 	exporter, err := prometheus.New(config, controller)
 	if err != nil {
-		log.Panicf("failed to initialize prometheus exporter %v", err)
+		return nil, errors.New("failed to initialize prometheus exporter").WithRootError(err)
 	}
 
-	metric, err := NewMetricClient(MetricClientParams{
-		ApplicationName:      c.applicationName,
-		MetricsServerPort:    c.metricsServerPort,
-		MetricsServerHandler: exporter,
-		MeterProvider:        exporter.MeterProvider(),
-	})
-	if err != nil {
-		errors.New("can't initialize Prometheus exporter").WithRootError(err)
-	}
+	meterProvider := exporter.MeterProvider()
+	global.SetMeterProvider(meterProvider)
 
-	return metric.Meter(ctx), nil
+	go func() {
+		http.HandleFunc("/metrics", exporter.ServeHTTP)
+		http.ListenAndServe(fmt.Sprintf(":%d", c.metricsServerPort), nil)
+	}()
+
+	return meterProvider.Meter(c.applicationName), nil
 }
