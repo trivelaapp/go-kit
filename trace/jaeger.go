@@ -31,7 +31,7 @@ type JaegerClient struct {
 }
 
 // NewJaegerClient create a new instance of a JaegerClient.
-func NewJaegerClient(params JaegerClientParams) (*JaegerClient, error) {
+func NewJaegerClient(params JaegerClientParams) (TraceProvider, error) {
 	if params.ApplicationName == "" {
 		return nil, errors.NewMissingRequiredDependency("ApplicationName")
 	}
@@ -54,7 +54,7 @@ func NewJaegerClient(params JaegerClientParams) (*JaegerClient, error) {
 
 // MustNewJaegerClient create a new instance of a JaegerClient.
 // It panics if any error is found.
-func MustNewJaegerClient(params JaegerClientParams) *JaegerClient {
+func MustNewJaegerClient(params JaegerClientParams) TraceProvider {
 	client, err := NewJaegerClient(params)
 	if err != nil {
 		panic(err)

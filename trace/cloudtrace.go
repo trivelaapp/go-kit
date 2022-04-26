@@ -31,7 +31,7 @@ type CloudTraceClient struct {
 }
 
 // NewCloudTraceClient create a new instance of a CloudTraceClient.
-func NewCloudTraceClient(params CloudTraceClientParams) (*CloudTraceClient, error) {
+func NewCloudTraceClient(params CloudTraceClientParams) (TraceProvider, error) {
 	if params.ApplicationName == "" {
 		return nil, errors.NewMissingRequiredDependency("ApplicationName")
 	}
@@ -54,7 +54,7 @@ func NewCloudTraceClient(params CloudTraceClientParams) (*CloudTraceClient, erro
 
 // MustNewCloudTraceClient create a new instance of a CloudTraceClient.
 // It panics if any error is found.
-func MustNewCloudTraceClient(params CloudTraceClientParams) *CloudTraceClient {
+func MustNewCloudTraceClient(params CloudTraceClientParams) TraceProvider {
 	client, err := NewCloudTraceClient(params)
 	if err != nil {
 		panic(err)
