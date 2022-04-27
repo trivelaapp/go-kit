@@ -118,7 +118,7 @@ func TestWithGCPCloudLoggingFormat(t *testing.T) {
 			logger.Error(ctx, errors.New("fake error"))
 		})
 
-		expectedLog := `{"attributes":{"@type":"type.googleapis.com/google.devtools.clouderrorreporting.v1beta1.ReportedErrorEvent","err_code":"UNKNOWN","err_kind":"UNEXPECTED","root_error":"fake error"},"message":"fake error","severity":"ERROR","time":"2020-12-01T12:00:00Z"}`
+		expectedLog := `{"@type":"type.googleapis.com/google.devtools.clouderrorreporting.v1beta1.ReportedErrorEvent","attributes":{"err_code":"UNKNOWN","err_kind":"UNEXPECTED","root_error":"fake error"},"message":"fake error","severity":"ERROR","time":"2020-12-01T12:00:00Z"}`
 		if diff := cmp.Diff(expectedLog, out); diff != "" {
 			t.Errorf("mismatch (-want, +got):\n%s", diff)
 		}
