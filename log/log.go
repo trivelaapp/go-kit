@@ -122,8 +122,8 @@ func (l Logger) Critical(ctx context.Context, err error) {
 	}
 }
 
-// Panic logs critical data and exists current program execution.
-func (l Logger) Panic(ctx context.Context, err error) {
+// Fatal logs critical data and exists current program execution.
+func (l Logger) Fatal(ctx context.Context, err error) {
 	if l.level >= LevelCritical {
 		l.printError(ctx, err, LevelCritical)
 		os.Exit(1)

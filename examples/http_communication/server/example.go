@@ -30,7 +30,7 @@ func main() {
 	})
 	_, flush, err := trace.Tracer(ctx)
 	if err != nil {
-		logger.Panic(ctx, err)
+		logger.Fatal(ctx, err)
 	}
 	defer flush(ctx)
 
@@ -41,7 +41,7 @@ func main() {
 		HistogramBoundaries: []float64{1, 2, 5, 10, 20, 50},
 	})
 	if _, _, err := metric.Meter(ctx); err != nil {
-		logger.Panic(ctx, err)
+		logger.Fatal(ctx, err)
 	}
 
 	srv := server.MustNew(server.ServerParams{

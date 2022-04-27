@@ -30,7 +30,7 @@ func main() {
 	})
 	tracer, flush, err := trace.Tracer(ctx)
 	if err != nil {
-		logger.Panic(ctx, err)
+		logger.Fatal(ctx, err)
 	}
 	defer flush(ctx)
 
