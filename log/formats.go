@@ -93,7 +93,7 @@ func (b gcpCloudLoggingWithTraceLogBuilder) build(ctx context.Context, in logInp
 
 		// Necessary to link error to Cloud Error Reporting.
 		// More details in: https://cloud.google.com/error-reporting/docs/formatting-error-messages#log-entry-examples
-		attrs["@type"] = "type.googleapis.com/google.devtools.clouderrorreporting.v1beta1.ReportedErrorEvent"
+		payload["@type"] = "type.googleapis.com/google.devtools.clouderrorreporting.v1beta1.ReportedErrorEvent"
 	}
 	if len(attrs) > 0 {
 		payload["attributes"] = attrs
