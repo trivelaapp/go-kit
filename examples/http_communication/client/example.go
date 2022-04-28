@@ -7,6 +7,7 @@ import (
 	"github.com/trivelaapp/go-kit/errors"
 	"github.com/trivelaapp/go-kit/http/client"
 	"github.com/trivelaapp/go-kit/log"
+	"github.com/trivelaapp/go-kit/log/format"
 	"github.com/trivelaapp/go-kit/trace"
 )
 
@@ -17,8 +18,8 @@ func main() {
 
 	logger := log.NewLogger(log.LoggerParams{
 		Level: "INFO",
-		Attributes: log.LogAttributeSet{
-			log.LogAttribute("foo"): true,
+		Attributes: format.LogAttributeSet{
+			format.LogAttribute("foo"): true,
 		},
 	})
 
@@ -42,7 +43,7 @@ func main() {
 	ctx = context.WithValue(ctx, "foo", "bar")
 
 	res, err := cli.Get(ctx, client.HTTPRequest{
-		URL: "http://localhost:8080/error",
+		URL: "http://localhost:3000/error",
 	})
 	if err != nil {
 		logger.Error(ctx, errors.New("can't call Server").WithRootError(err))

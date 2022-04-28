@@ -8,6 +8,7 @@ import (
 
 	"github.com/trivelaapp/go-kit/errors"
 	"github.com/trivelaapp/go-kit/http/server"
+	"github.com/trivelaapp/go-kit/http/server/middleware"
 	"github.com/trivelaapp/go-kit/log"
 	"github.com/trivelaapp/go-kit/metric"
 	"github.com/trivelaapp/go-kit/trace"
@@ -44,13 +45,13 @@ func main() {
 		logger.Fatal(ctx, err)
 	}
 
-	srv := server.MustNew(server.ServerParams{
+	router := gin.New()
+
+	middlewares := middleware.Default(middleware.DefaultInput{
 		ApplicationName: applicationName,
-		Port:            8080,
 		Logger:          logger,
 	})
-
-	router := srv.RouterDefault()
+	router.Use(middlewares...)
 
 	router.GET("/ping", func(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, server.NewMessageResponse("pong"))
@@ -65,5 +66,6 @@ func main() {
 		ctx.Abort()
 	})
 
-	router.Run()
+	logger.Info(ctx, "Server up and running on port 3000...")
+	router.Run(":3000")
 }
