@@ -10,81 +10,42 @@ import (
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/metric/global"
 	"go.opentelemetry.io/otel/metric/instrument/syncint64"
+
+	"github.com/trivelaapp/go-kit/log/format"
 )
-
-// Level indicates the severity of the data being logged.
-type Level int
-
-const (
-	// LevelCritical alerts about severe problems. Most of the time, needs some human intervention ASAP.
-	LevelCritical Level = iota + 1
-	// LevelError alerts about events that are likely to cause problems.
-	LevelError
-	// LevelWarning warns about events the might cause problems to the system.
-	LevelWarning
-	// LevelInfo are routine information.
-	LevelInfo
-	// LevelDebug are debug or trace information.
-	LevelDebug
-)
-
-var levelStringValueMap = map[string]Level{
-	"CRITICAL": LevelCritical,
-	"ERROR":    LevelError,
-	"WARNING":  LevelWarning,
-	"INFO":     LevelInfo,
-	"DEBUG":    LevelDebug,
-}
-
-// String returns the name of the LogLevel.
-func (l Level) String() string {
-	return []string{
-		"CRITICAL",
-		"ERROR",
-		"WARNING",
-		"INFO",
-		"DEBUG",
-	}[l-1]
-}
 
 // LoggerParams defines the dependencies of a Logger.
 type LoggerParams struct {
 	Level      string
-	Attributes LogAttributeSet
+	Formatter  LogFormatter
+	Attributes format.LogAttributeSet
 }
 
 // Logger is the structure responsible for log data.
 type Logger struct {
-	level          Level
-	payloadBuilder payloadBuilder
-	attributes     LogAttributeSet
-	now            func() time.Time
+	level      Level
+	formatter  LogFormatter
+	attributes format.LogAttributeSet
+	now        func() time.Time
 }
 
 // NewLogger constructs a new Logger instance.
-func NewLogger(in LoggerParams) *Logger {
+func NewLogger(params LoggerParams) *Logger {
 	logger := &Logger{
-		level:          levelStringValueMap[in.Level],
-		payloadBuilder: defaultLogBuilder{},
-		attributes:     in.Attributes,
-		now:            time.Now,
+		level:      levelStringValueMap[params.Level],
+		attributes: params.Attributes,
+		now:        time.Now,
 	}
 
 	if logger.level < LevelCritical || logger.level > LevelDebug {
 		logger.level = LevelInfo
 	}
 
+	if params.Formatter == nil {
+		logger.formatter = format.NewDefault()
+	}
+
 	return logger
-}
-
-func (l Logger) WithTraceFormat() Logger {
-	l.payloadBuilder = defaultWithTraceLogBuilder{}
-	return l
-}
-
-func (l Logger) WithGCPCloudLoggingFormat(projectID string) Logger {
-	l.payloadBuilder = gcpCloudLoggingWithTraceLogBuilder{projectID: projectID}
-	return l
 }
 
 // Debug logs debug data.
@@ -130,20 +91,12 @@ func (l Logger) Fatal(ctx context.Context, err error) {
 	}
 }
 
-type logInput struct {
-	level      Level
-	message    string
-	err        error
-	attributes LogAttributeSet
-	timestamp  time.Time
-}
-
 func (l Logger) print(ctx context.Context, msg string, level Level) {
-	payload := l.payloadBuilder.build(ctx, logInput{
-		level:      level,
-		message:    msg,
-		attributes: l.attributes,
-		timestamp:  l.now(),
+	payload := l.formatter.Format(ctx, format.LogInput{
+		Level:      level.String(),
+		Message:    msg,
+		Attributes: l.attributes,
+		Timestamp:  l.now(),
 	})
 
 	data, _ := json.Marshal(payload)
@@ -151,12 +104,12 @@ func (l Logger) print(ctx context.Context, msg string, level Level) {
 }
 
 func (l Logger) printError(ctx context.Context, err error, level Level) {
-	payload := l.payloadBuilder.build(ctx, logInput{
-		level:      level,
-		message:    err.Error(),
-		err:        err,
-		attributes: l.attributes,
-		timestamp:  l.now(),
+	payload := l.formatter.Format(ctx, format.LogInput{
+		Level:      level.String(),
+		Message:    err.Error(),
+		Err:        err,
+		Attributes: l.attributes,
+		Timestamp:  l.now(),
 	})
 
 	data, _ := json.Marshal(payload)

@@ -10,6 +10,8 @@ import (
 	"time"
 
 	"github.com/google/go-cmp/cmp"
+
+	"github.com/trivelaapp/go-kit/log/format"
 )
 
 func mockedTimmer() func() time.Time {
@@ -43,88 +45,6 @@ func TestNewLogger(t *testing.T) {
 	})
 }
 
-func TestNewLoggerWithTraceFormat(t *testing.T) {
-	t.Run("should use LogLevel INFO when not specified", func(t *testing.T) {
-		ctx := context.Background()
-
-		logger := NewLogger(LoggerParams{}).WithTraceFormat()
-		logger.now = mockedTimmer()
-
-		out := captureOutput(func() {
-			logger.Debug(ctx, "random message")
-		})
-
-		if diff := cmp.Diff("", out); diff != "" {
-			t.Errorf("mismatch (-want, +got):\n%s", diff)
-		}
-
-		out = captureOutput(func() {
-			logger.Info(ctx, "random message")
-		})
-
-		if diff := cmp.Diff(`{"level":"INFO","message":"random message","timestamp":"2020-12-01T12:00:00Z"}`, out); diff != "" {
-			t.Errorf("mismatch (-want, +got):\n%s", diff)
-		}
-	})
-
-	t.Run("should with error attributes", func(t *testing.T) {
-		ctx := context.Background()
-
-		logger := NewLogger(LoggerParams{}).WithTraceFormat()
-		logger.now = mockedTimmer()
-
-		out := captureOutput(func() {
-			logger.Error(ctx, errors.New("fake error"))
-		})
-
-		expectedLog := `{"attributes":{"err_code":"UNKNOWN","err_kind":"UNEXPECTED","root_error":"fake error"},"level":"ERROR","message":"fake error","timestamp":"2020-12-01T12:00:00Z"}`
-		if diff := cmp.Diff(expectedLog, out); diff != "" {
-			t.Errorf("mismatch (-want, +got):\n%s", diff)
-		}
-	})
-}
-
-func TestWithGCPCloudLoggingFormat(t *testing.T) {
-	t.Run("should use LogLevel INFO when not specified", func(t *testing.T) {
-		ctx := context.Background()
-
-		logger := NewLogger(LoggerParams{}).WithGCPCloudLoggingFormat("fake-project-id")
-		logger.now = mockedTimmer()
-
-		out := captureOutput(func() {
-			logger.Debug(ctx, "random message")
-		})
-
-		if diff := cmp.Diff("", out); diff != "" {
-			t.Errorf("mismatch (-want, +got):\n%s", diff)
-		}
-
-		out = captureOutput(func() {
-			logger.Info(ctx, "random message")
-		})
-
-		if diff := cmp.Diff(`{"message":"random message","severity":"INFO","time":"2020-12-01T12:00:00Z"}`, out); diff != "" {
-			t.Errorf("mismatch (-want, +got):\n%s", diff)
-		}
-	})
-
-	t.Run("should with error attributes", func(t *testing.T) {
-		ctx := context.Background()
-
-		logger := NewLogger(LoggerParams{}).WithGCPCloudLoggingFormat("fake-project-id")
-		logger.now = mockedTimmer()
-
-		out := captureOutput(func() {
-			logger.Error(ctx, errors.New("fake error"))
-		})
-
-		expectedLog := `{"@type":"type.googleapis.com/google.devtools.clouderrorreporting.v1beta1.ReportedErrorEvent","attributes":{"err_code":"UNKNOWN","err_kind":"UNEXPECTED","root_error":"fake error"},"message":"fake error","severity":"ERROR","time":"2020-12-01T12:00:00Z"}`
-		if diff := cmp.Diff(expectedLog, out); diff != "" {
-			t.Errorf("mismatch (-want, +got):\n%s", diff)
-		}
-	})
-}
-
 func TestDebug(t *testing.T) {
 	ctx := context.Background()
 
@@ -132,7 +52,7 @@ func TestDebug(t *testing.T) {
 		desc        string
 		ctx         context.Context
 		level       string
-		attrs       LogAttributeSet
+		attrs       format.LogAttributeSet
 		msg         string
 		msgArgs     []interface{}
 		expectedLog string
@@ -185,7 +105,7 @@ func TestDebug(t *testing.T) {
 			ctx:         context.WithValue(ctx, "attr1", "value1"),
 			level:       "DEBUG",
 			msg:         "random message",
-			attrs:       LogAttributeSet{"attr1": true},
+			attrs:       format.LogAttributeSet{"attr1": true},
 			expectedLog: `{"attributes":{"attr1":"value1"},"level":"DEBUG","message":"random message","timestamp":"2020-12-01T12:00:00Z"}`,
 		},
 	}
@@ -213,7 +133,7 @@ func TestInfo(t *testing.T) {
 		desc        string
 		ctx         context.Context
 		level       string
-		attrs       LogAttributeSet
+		attrs       format.LogAttributeSet
 		msg         string
 		msgArgs     []interface{}
 		expectedLog string
@@ -266,7 +186,7 @@ func TestInfo(t *testing.T) {
 			ctx:         context.WithValue(ctx, "attr1", "value1"),
 			level:       "DEBUG",
 			msg:         "random message",
-			attrs:       LogAttributeSet{"attr1": true},
+			attrs:       format.LogAttributeSet{"attr1": true},
 			expectedLog: `{"attributes":{"attr1":"value1"},"level":"INFO","message":"random message","timestamp":"2020-12-01T12:00:00Z"}`,
 		},
 	}
@@ -294,7 +214,7 @@ func TestWarning(t *testing.T) {
 		desc        string
 		ctx         context.Context
 		level       string
-		attrs       LogAttributeSet
+		attrs       format.LogAttributeSet
 		msg         string
 		msgArgs     []interface{}
 		expectedLog string
@@ -347,7 +267,7 @@ func TestWarning(t *testing.T) {
 			ctx:         context.WithValue(ctx, "attr1", "value1"),
 			level:       "DEBUG",
 			msg:         "random message",
-			attrs:       LogAttributeSet{"attr1": true},
+			attrs:       format.LogAttributeSet{"attr1": true},
 			expectedLog: `{"attributes":{"attr1":"value1"},"level":"WARNING","message":"random message","timestamp":"2020-12-01T12:00:00Z"}`,
 		},
 	}
@@ -375,7 +295,7 @@ func TestError(t *testing.T) {
 		desc        string
 		ctx         context.Context
 		level       string
-		attrs       LogAttributeSet
+		attrs       format.LogAttributeSet
 		err         error
 		expectedLog string
 	}{
@@ -419,7 +339,7 @@ func TestError(t *testing.T) {
 			ctx:         context.WithValue(ctx, "attr1", "value1"),
 			level:       "DEBUG",
 			err:         errors.New("random error"),
-			attrs:       LogAttributeSet{"attr1": true},
+			attrs:       format.LogAttributeSet{"attr1": true},
 			expectedLog: `{"attributes":{"attr1":"value1","err_code":"UNKNOWN","err_kind":"UNEXPECTED","root_error":"random error"},"level":"ERROR","message":"random error","timestamp":"2020-12-01T12:00:00Z"}`,
 		},
 	}
@@ -447,7 +367,7 @@ func TestCritical(t *testing.T) {
 		desc        string
 		ctx         context.Context
 		level       string
-		attrs       LogAttributeSet
+		attrs       format.LogAttributeSet
 		err         error
 		expectedLog string
 	}{
@@ -491,7 +411,7 @@ func TestCritical(t *testing.T) {
 			ctx:         context.WithValue(ctx, "attr1", "value1"),
 			level:       "DEBUG",
 			err:         errors.New("random error"),
-			attrs:       LogAttributeSet{"attr1": true},
+			attrs:       format.LogAttributeSet{"attr1": true},
 			expectedLog: `{"attributes":{"attr1":"value1","err_code":"UNKNOWN","err_kind":"UNEXPECTED","root_error":"random error"},"level":"CRITICAL","message":"random error","timestamp":"2020-12-01T12:00:00Z"}`,
 		},
 	}
