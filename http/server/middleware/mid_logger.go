@@ -7,6 +7,13 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	semconv "go.opentelemetry.io/otel/semconv/v1.7.0"
+)
+
+const (
+	// HTTPResponseLatencyKey is the amount of time needed to produce a response to a request.
+	// Time measured in milliseconds.
+	HTTPResponseLatencyKey = "http.response_latency_in_milli"
 )
 
 // LogProvider defines how a logger should behave.
@@ -30,30 +37,26 @@ func Logger(logger LogProvider) func(ctx *gin.Context) {
 
 		now := time.Now()
 		latency := now.Sub(start).Milliseconds()
-		clientIP := ctx.ClientIP()
 		statusCode := ctx.Writer.Status()
-		responseSize := ctx.Writer.Size()
 
-		msg := "[GIN] [%s] [%s] %s %s (%d | %dms | %dB)"
-		args := []any{
-			now.UTC().Format(time.RFC3339),
-			clientIP,
-			method,
-			path,
-			statusCode,
-			latency,
-			responseSize,
-		}
+		lctx := context.WithValue(ctx, string(semconv.NetPeerIPKey), ctx.ClientIP())
+		lctx = context.WithValue(lctx, string(semconv.HTTPMethodKey), method)
+		lctx = context.WithValue(lctx, string(semconv.HTTPRouteKey), path)
+		lctx = context.WithValue(lctx, string(semconv.HTTPStatusCodeKey), statusCode)
+		lctx = context.WithValue(lctx, string(semconv.HTTPResponseContentLengthKey), ctx.Writer.Size())
+		lctx = context.WithValue(lctx, string(HTTPResponseLatencyKey), latency)
+
+		msg := fmt.Sprintf("[GIN] %s %s", method, path)
 
 		switch {
-		case statusCode < 300:
-			logger.Info(ctx, msg, args...)
+		case statusCode >= 500:
+			logger.Error(lctx, errors.New(msg))
 			break
-		case statusCode < 500:
-			logger.Warning(ctx, msg, args...)
+		case statusCode >= 300:
+			logger.Warning(lctx, msg)
 			break
 		default:
-			logger.Error(ctx, errors.New(fmt.Sprintf(msg, args...)))
+			logger.Info(lctx, msg)
 		}
 	}
 }

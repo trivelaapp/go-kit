@@ -10,6 +10,7 @@ import (
 	"github.com/trivelaapp/go-kit/http/server"
 	"github.com/trivelaapp/go-kit/http/server/middleware"
 	"github.com/trivelaapp/go-kit/log"
+	"github.com/trivelaapp/go-kit/log/format"
 	"github.com/trivelaapp/go-kit/metric"
 	"github.com/trivelaapp/go-kit/trace"
 )
@@ -20,7 +21,8 @@ func main() {
 	ctx := context.Background()
 
 	logger := log.NewLogger(log.LoggerParams{
-		Level: "INFO",
+		Level:      "INFO",
+		Attributes: format.DefaultHTTPServerAttributeSet,
 	})
 
 	trace := trace.MustNewJaegerTracerProvider(trace.JaegerTracerProviderParams{
