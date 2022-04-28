@@ -37,6 +37,7 @@ func NewLogger(params LoggerParams) *Logger {
 	logger := &Logger{
 		level:      levelStringValueMap[params.Level],
 		attributes: params.Attributes,
+		formatter:  params.Formatter,
 		now:        time.Now,
 	}
 
@@ -44,7 +45,7 @@ func NewLogger(params LoggerParams) *Logger {
 		logger.level = LevelInfo
 	}
 
-	if params.Formatter == nil {
+	if logger.formatter == nil {
 		logger.formatter = format.NewDefault()
 	}
 
