@@ -11,6 +11,13 @@ import (
 	"github.com/trivelaapp/go-kit/errors"
 )
 
+// GCPCloudLoggingLogFormatterParams encapsulates necessary parameters to construct a GCP Cloud Logging LogFormatter.
+type GCPCloudLoggingLogFormatterParams struct {
+	ProjectID          string
+	ApplicationName    string
+	ApplicationVersion string
+}
+
 type gcpCloudLoggingLogFormatter struct {
 	projectID          string
 	applicationName    string
@@ -18,8 +25,35 @@ type gcpCloudLoggingLogFormatter struct {
 }
 
 // NewGCPCloudLogging creates a new GCP Cloud Logging LogFormatter.
-func NewGCPCloudLogging() (*gcpCloudLoggingLogFormatter, error) {
-	return &gcpCloudLoggingLogFormatter{}, nil
+func NewGCPCloudLogging(params GCPCloudLoggingLogFormatterParams) (*gcpCloudLoggingLogFormatter, error) {
+	if params.ApplicationName == "" {
+		return nil, errors.NewMissingRequiredDependency("ApplicationName")
+	}
+
+	if params.ApplicationVersion == "" {
+		return nil, errors.NewMissingRequiredDependency("ApplicationVersion")
+	}
+
+	if params.ProjectID == "" {
+		return nil, errors.NewMissingRequiredDependency("ProjectID")
+	}
+
+	return &gcpCloudLoggingLogFormatter{
+		projectID:          params.ProjectID,
+		applicationName:    params.ApplicationName,
+		applicationVersion: params.ApplicationVersion,
+	}, nil
+}
+
+// MustNewGCPCloudLogging creates a new GCP Cloud Logging LogFormatter.
+// It panics if any error is found.
+func MustNewGCPCloudLogging(params GCPCloudLoggingLogFormatterParams) *gcpCloudLoggingLogFormatter {
+	formatter, err := NewGCPCloudLogging(params)
+	if err != nil {
+		panic(err)
+	}
+
+	return formatter
 }
 
 // Format formats the log payload that will be rendered in accordance with Cloud Logging standards..
