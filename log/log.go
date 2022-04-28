@@ -125,11 +125,11 @@ func (l Logger) printError(ctx context.Context, err error, level Level) {
 			attribute.String("level", level.String()),
 		}
 
-		if service := ctx.Value(semconv.ServiceNameKey); service != nil {
+		if service := ctx.Value(string(semconv.ServiceNameKey)); service != nil {
 			attribute.String(string(semconv.ServiceNameKey), service.(string))
 		}
 
-		if version := ctx.Value(semconv.ServiceVersionKey); version != nil {
+		if version := ctx.Value(string(semconv.ServiceVersionKey)); version != nil {
 			attribute.String(string(semconv.ServiceVersionKey), version.(string))
 		}
 
