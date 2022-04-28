@@ -9,7 +9,10 @@ import (
 
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/metric/global"
+	"go.opentelemetry.io/otel/metric/instrument"
 	"go.opentelemetry.io/otel/metric/instrument/syncint64"
+	"go.opentelemetry.io/otel/metric/unit"
+	semconv "go.opentelemetry.io/otel/semconv/v1.7.0"
 
 	"github.com/trivelaapp/go-kit/log/format"
 )
@@ -117,7 +120,19 @@ func (l Logger) printError(ctx context.Context, err error, level Level) {
 
 	counter := errorCounter()
 	if counter != nil {
-		counter.Add(ctx, 1, attribute.String("level", level.String()))
+		attrs := []attribute.KeyValue{
+			attribute.String("level", level.String()),
+		}
+
+		if service := ctx.Value(semconv.ServiceNameKey); service != nil {
+			attribute.String(string(semconv.ServiceNameKey), service.(string))
+		}
+
+		if version := ctx.Value(semconv.ServiceVersionKey); version != nil {
+			attribute.String(string(semconv.ServiceVersionKey), version.(string))
+		}
+
+		counter.Add(ctx, 1, attrs...)
 	}
 }
 
@@ -128,7 +143,11 @@ func errorCounter() syncint64.Counter {
 		return errCounter
 	}
 
-	counter, err := global.Meter("trivelaapp.go-kit.errors").SyncInt64().Counter("app.error_counter")
+	counter, err := global.Meter("trivelaapp.go-kit.errors").SyncInt64().Counter(
+		"app.error_counter",
+		instrument.WithDescription("Counts errors logged by the application"),
+		instrument.WithUnit(unit.Dimensionless),
+	)
 	if err != nil {
 		return nil
 	}
