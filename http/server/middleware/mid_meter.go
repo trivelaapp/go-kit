@@ -59,15 +59,23 @@ func Meter(applicationName string) func(ctx *gin.Context) {
 		ctx.Next()
 
 		attributes := []attribute.KeyValue{
-			attribute.String("service_name", applicationName),
+			attribute.String("application_name", applicationName),
 			attribute.String("path", ctx.FullPath()),
 			attribute.String("method", ctx.Request.Method),
 			attribute.Int("status_code", ctx.Writer.Status()),
 		}
 
+		var requestSize, responseSize int64
+		if ctx.Request.ContentLength > 0 {
+			requestSize = ctx.Request.ContentLength
+		}
+		if ctx.Writer.Size() > 0 {
+			responseSize = int64(ctx.Writer.Size())
+		}
+
 		counters[requestCounterName].Add(ctx, 1, attributes...)
-		counters[requestBytesCounterName].Add(ctx, ctx.Request.ContentLength, attributes...)
-		counters[responseBytesCounterName].Add(ctx, int64(ctx.Writer.Size()))
+		counters[requestBytesCounterName].Add(ctx, requestSize, attributes...)
+		counters[responseBytesCounterName].Add(ctx, responseSize, attributes...)
 
 		latency := time.Now().Sub(start).Milliseconds()
 		histograms[responseLatencyHistogramName].Record(ctx, latency, attributes...)
