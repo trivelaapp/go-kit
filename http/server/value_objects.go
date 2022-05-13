@@ -2,6 +2,22 @@ package server
 
 import (
 	"fmt"
+
+	"github.com/trivelaapp/go-kit/errors"
+)
+
+var (
+	// ErrRequestQueryStringValidation indicates a failure during request query string binding.
+	ErrRequestQueryStringValidation errors.CustomError = errors.
+					New("request query string validation failed").
+					WithKind(errors.KindInvalidInput).
+					WithCode("ERR_REQUEST_QUERY_STRING_VALIDATION")
+
+	// ErrRequestBodyValidation indicates a failure during request body binding.
+	ErrRequestBodyValidation errors.CustomError = errors.
+					New("request query string validation failed").
+					WithKind(errors.KindInvalidInput).
+					WithCode("ERR_REQUEST_BODY_VALIDATION")
 )
 
 type messageResponse struct {
