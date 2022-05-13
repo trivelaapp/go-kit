@@ -21,7 +21,7 @@ func Default(in DefaultInput) []gin.HandlerFunc {
 		Meter(in.ApplicationName),
 		gin.Recovery(),
 		otelgin.Middleware(in.ApplicationName),
-		Logger(in.Logger),
 		ErrorHandler,
+		Logger(in.Logger),
 	}
 }
