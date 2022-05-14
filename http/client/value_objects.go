@@ -17,5 +17,6 @@ type HTTPRequest struct {
 // HTTPResult are the params returned from the client HTTP request
 type HTTPResult struct {
 	StatusCode int
+	Location   string
 	Response   []byte
 }

@@ -104,8 +104,11 @@ func (c Client) processRequest(ctx context.Context, method string, request HTTPR
 		return HTTPResult{}, err
 	}
 
+	location, _ := res.Location()
+
 	return HTTPResult{
 		Response:   body,
+		Location:   location.String(),
 		StatusCode: res.StatusCode,
 	}, nil
 }
