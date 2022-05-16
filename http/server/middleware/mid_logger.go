@@ -2,12 +2,13 @@ package middleware
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	semconv "go.opentelemetry.io/otel/semconv/v1.7.0"
+
+	"github.com/trivelaapp/go-kit/errors"
 )
 
 const (
