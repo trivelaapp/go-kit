@@ -52,7 +52,7 @@ func Logger(logger LogProvider) func(ctx *gin.Context) {
 		case statusCode >= 500:
 			logger.Error(lctx, errors.New(msg))
 			break
-		case statusCode >= 300:
+		case statusCode >= 400:
 			logger.Warning(lctx, msg)
 			break
 		default:
