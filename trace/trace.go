@@ -87,5 +87,5 @@ func (c TraceClient) Tracer(ctx context.Context) (trace.Tracer, func(context.Con
 		propagation.Baggage{},
 	))
 
-	return tp.Tracer(c.applicationName), tp.Shutdown
+	return tp.Tracer(c.applicationName), tp.ForceFlush
 }
