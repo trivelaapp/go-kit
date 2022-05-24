@@ -3,6 +3,8 @@ module github.com/trivelaapp/go-kit/trace
 go 1.18
 
 require (
+	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v1.4.0
+	github.com/trivelaapp/go-kit/errors v0.2.0
 	go.opentelemetry.io/otel v1.6.3
 	go.opentelemetry.io/otel/exporters/jaeger v1.6.3
 	go.opentelemetry.io/otel/sdk v1.6.3
@@ -12,7 +14,6 @@ require (
 require (
 	cloud.google.com/go/compute v1.5.0 // indirect
 	cloud.google.com/go/trace v1.2.0 // indirect
-	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v1.4.0 // indirect
 	github.com/go-logr/logr v1.2.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
