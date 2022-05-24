@@ -7,4 +7,5 @@ use (
 	./log
 	./metric
 	./trace
+	./grpc
 )
