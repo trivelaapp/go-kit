@@ -8,6 +8,7 @@ import (
 	"go.opentelemetry.io/otel/attribute"
 	semconv "go.opentelemetry.io/otel/semconv/v1.7.0"
 
+	grpc_interceptor "github.com/trivelaapp/go-kit/grpc/server/interceptor/logging"
 	"github.com/trivelaapp/go-kit/http/server/middleware"
 )
 
@@ -61,6 +62,16 @@ var DefaultHTTPServerAttributeSet LogAttributeSet = LogAttributeSet{
 	LogAttribute(semconv.HTTPStatusCodeKey):            true,
 	LogAttribute(semconv.HTTPResponseContentLengthKey): true,
 	LogAttribute(middleware.HTTPResponseLatencyKey):    true,
+}
+
+// DefaultGRPCServerAttributeSet defines some useful LogAttributes usually used in gRPC Servers context.
+var DefaultGRPCServerAttributeSet LogAttributeSet = LogAttributeSet{
+	LogAttribute(semconv.ServiceNameKey):                  true,
+	LogAttribute(semconv.ServiceVersionKey):               true,
+	LogAttribute(semconv.NetPeerIPKey):                    true,
+	LogAttribute(semconv.RPCMethodKey):                    true,
+	LogAttribute(semconv.RPCGRPCStatusCodeKey):            true,
+	LogAttribute(grpc_interceptor.GRPCResponseLatencyKey): true,
 }
 
 func extractLogAttributesFromContext(ctx context.Context, attrSet LogAttributeSet) map[LogAttribute]any {
