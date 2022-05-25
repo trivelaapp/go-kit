@@ -13,7 +13,8 @@ type DefaultInput struct {
 
 // Default returns a list of middlewares usually used by most applications. It includes:
 // - Disaster Recovery (from panics)
-// - Tracing
+// - Traces
+// - Metrics
 // - Request Logging
 // - Error Handling
 func Default(in DefaultInput) []gin.HandlerFunc {

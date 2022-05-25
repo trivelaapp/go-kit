@@ -13,8 +13,7 @@ import (
 
 const (
 	// HTTPResponseLatencyKey is the amount of time needed to produce a response to a request.
-	// Time measured in milliseconds.
-	HTTPResponseLatencyKey = "http.response_latency_in_milli"
+	HTTPResponseLatencyKey = "http.response_latency"
 )
 
 // LogProvider defines how a logger should behave.
@@ -37,7 +36,7 @@ func Logger(logger LogProvider) func(ctx *gin.Context) {
 		ctx.Next()
 
 		now := time.Now()
-		latency := now.Sub(start).Milliseconds()
+		latency := now.Sub(start).String()
 		statusCode := ctx.Writer.Status()
 
 		lctx := context.WithValue(ctx, string(semconv.NetPeerIPKey), ctx.ClientIP())
