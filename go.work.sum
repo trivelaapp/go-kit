@@ -1,4 +1,7 @@
-cloud.google.com/go v0.100.2 h1:t9Iw5QH5v4XtlEQaCtUY7x6sCABps8sW0acw7e2WQ6Y=
 github.com/cespare/xxhash v1.1.0 h1:a6HrQnmkObjyL+Gs60czilIUGqrzKutQD6XZog3p+ko=
 github.com/ugorji/go v1.2.7 h1:qYhyWUUd6WbiM+C6JZAUkIJt/1WrjzNHY9+KCIjVqTo=
+go.buf.build/grpc/go/trivela/go-kit-example v1.3.1 h1:8dOeHWPUB/KLf/s0vvOaWgVsqClLzyoDzYMU//HhgsQ=
+go.buf.build/grpc/go/trivela/go-kit-example v1.3.1/go.mod h1:mT+sOiBMDdSmiqU6UlVwAH+A9XAabdb9S/agT2Q8w4g=
+go.buf.build/grpc/go/trivela/go-kit-example v1.3.2 h1:ijMwm4fiyUHuOTavIKSVrGqKMXaSpn8rzuaQfD3EvAY=
+go.buf.build/grpc/go/trivela/go-kit-example v1.3.2/go.mod h1:mT+sOiBMDdSmiqU6UlVwAH+A9XAabdb9S/agT2Q8w4g=
 golang.org/x/net v0.0.0-20211112202133-69e39bad7dc2 h1:CIJ76btIcR3eFI5EgSo6k1qKw9KJexJuRLI9G7Hp5wE=

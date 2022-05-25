@@ -8,7 +8,7 @@ require (
 	github.com/trivelaapp/go-kit/log v0.2.7
 	github.com/trivelaapp/go-kit/metric v0.2.1
 	github.com/trivelaapp/go-kit/trace v0.2.3
-	go.buf.build/grpc/go/trivela/go-kit-example v1.3.2
+	go.buf.build/grpc/go/trivela/go-kit-example v1.3.3
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.32.0
 	go.opentelemetry.io/otel v1.7.0
 	go.opentelemetry.io/otel/trace v1.7.0
