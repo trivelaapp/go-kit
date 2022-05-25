@@ -8,4 +8,5 @@ use (
 	./metric
 	./trace
 	./grpc
+	./examples/grpc_communication
 )

@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package example.v1;
+
+// HelloRequest encapsulates properties to execute a Hello action on a ExampleService.
+message HelloRequest {
+  string name = 1;
+}
+
+// HelloResponse encapsulates the response produced by a Hello action on ExampleService.
+message HelloResponse {
+  string message = 1;
+}
+
+// StreamHelloRequest encapsulates properties to execute a StreamHello action on a ExampleService.
+message StreamHelloRequest {
+  HelloRequest data = 1;
+}
+
+// StreamHelloResponse encapsulates the response produced by a StreamHello action on ExampleService.
+message StreamHelloResponse {
+  HelloResponse data = 1;
+}
+
+// ExampleService serves features that models interactions with the Example Service.
+service ExampleService {
+  // Hello greets the user.
+  rpc Hello(HelloRequest) returns (HelloResponse);
+
+  // StreamHello greets users by an stream.
+  rpc StreamHello(stream StreamHelloRequest) returns (stream StreamHelloResponse);
+}
