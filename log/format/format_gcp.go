@@ -59,9 +59,13 @@ func MustNewGCPCloudLogging(params GCPCloudLoggingLogFormatterParams) *gcpCloudL
 // Format formats the log payload that will be rendered in accordance with Cloud Logging standards..
 func (b gcpCloudLoggingLogFormatter) Format(ctx context.Context, in LogInput) any {
 	payload := map[string]any{
-		"severity":  in.Level,
-		"timestamp": in.Timestamp.Format(time.RFC3339),
-		"message":   in.Message,
+		"severity": in.Level,
+		"time":     in.Timestamp.Format(time.RFC3339),
+		"message":  in.Message,
+	}
+
+	if in.Payload != nil {
+		payload["payload"] = in.Payload
 	}
 
 	attrs := extractLogAttributesFromContext(ctx, in.Attributes)

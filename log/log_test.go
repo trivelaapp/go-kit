@@ -432,6 +432,65 @@ func TestCritical(t *testing.T) {
 	}
 }
 
+func TestJSON(t *testing.T) {
+	ctx := context.Background()
+
+	tt := []struct {
+		desc        string
+		ctx         context.Context
+		sysLogLevel string
+		level       []Level
+		attrs       format.LogAttributeSet
+		data        any
+		expectedLog string
+	}{
+		{
+			desc:        "should log when system LogLevel is DEBUG and uses default JSON log Level",
+			ctx:         ctx,
+			sysLogLevel: "DEBUG",
+			data:        map[string]string{"foo": "bar"},
+			expectedLog: `{"level":"DEBUG","message":"JSON data logged","payload":{"foo":"bar"},"timestamp":"2020-12-01T12:00:00Z"}`,
+		},
+		{
+			desc:        "should log an error when data can not be JSON marshalled",
+			ctx:         ctx,
+			sysLogLevel: "DEBUG",
+			data:        make(chan int),
+			expectedLog: `{"attributes":{"err_code":"UNKNOWN","err_kind":"UNEXPECTED","root_error":"json: unsupported type: chan int"},"level":"ERROR","message":"could not marshal payload to JSON format","timestamp":"2020-12-01T12:00:00Z"}`,
+		},
+		{
+			desc:        "should not log anything when system LogLevel is INFO and uses default JSON log Level",
+			ctx:         ctx,
+			sysLogLevel: "INFO",
+			data:        map[string]string{"foo": "bar"},
+			expectedLog: "",
+		},
+		{
+			desc:        "should log when system LogLevel is INFO and JSON log Level is WARNING",
+			ctx:         ctx,
+			sysLogLevel: "INFO",
+			level:       []Level{LevelWarning},
+			data:        map[string]string{"foo": "bar"},
+			expectedLog: `{"level":"WARNING","message":"JSON data logged","payload":{"foo":"bar"},"timestamp":"2020-12-01T12:00:00Z"}`,
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.desc, func(t *testing.T) {
+			logger := NewLogger(LoggerParams{Level: tc.sysLogLevel, Attributes: tc.attrs})
+			logger.now = mockedTimmer()
+
+			out := captureOutput(func() {
+				logger.JSON(tc.ctx, tc.data, tc.level...)
+			})
+
+			if diff := cmp.Diff(tc.expectedLog, out); diff != "" {
+				t.Errorf("mismatch (-want, +got):\n%s", diff)
+			}
+		})
+	}
+}
+
 func captureOutput(output func()) string {
 	rescueStdout := os.Stdout
 	r, w, _ := os.Pipe()

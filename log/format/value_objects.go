@@ -17,6 +17,7 @@ type LogInput struct {
 	Level      string
 	Message    string
 	Err        error
+	Payload    any
 	Attributes LogAttributeSet
 	Timestamp  time.Time
 }

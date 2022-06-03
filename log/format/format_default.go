@@ -25,6 +25,10 @@ func (b defaultLogFormatter) Format(ctx context.Context, in LogInput) any {
 		"message":   in.Message,
 	}
 
+	if in.Payload != nil {
+		payload["payload"] = in.Payload
+	}
+
 	attrs := extractLogAttributesFromContext(ctx, in.Attributes)
 	if in.Err != nil {
 		attrs[LogAttributeRootError] = errors.RootError(in.Err)
