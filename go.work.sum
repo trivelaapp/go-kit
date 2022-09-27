@@ -1,7 +1,10 @@
+cloud.google.com/go v0.102.1/go.mod h1:XZ77E9qnTEnrgEOvr4xzfdX5TRo7fB4T2F4O6+34hIU=
+cloud.google.com/go/storage v1.23.0/go.mod h1:vOEEDNFnciUMhBeT6hsJIn3ieU5cFRmzeLgDvXzfIXc=
 github.com/cespare/xxhash v1.1.0 h1:a6HrQnmkObjyL+Gs60czilIUGqrzKutQD6XZog3p+ko=
 github.com/ugorji/go v1.2.7 h1:qYhyWUUd6WbiM+C6JZAUkIJt/1WrjzNHY9+KCIjVqTo=
-go.buf.build/grpc/go/trivela/go-kit-example v1.3.1 h1:8dOeHWPUB/KLf/s0vvOaWgVsqClLzyoDzYMU//HhgsQ=
-go.buf.build/grpc/go/trivela/go-kit-example v1.3.1/go.mod h1:mT+sOiBMDdSmiqU6UlVwAH+A9XAabdb9S/agT2Q8w4g=
 go.buf.build/grpc/go/trivela/go-kit-example v1.3.2 h1:ijMwm4fiyUHuOTavIKSVrGqKMXaSpn8rzuaQfD3EvAY=
 go.buf.build/grpc/go/trivela/go-kit-example v1.3.2/go.mod h1:mT+sOiBMDdSmiqU6UlVwAH+A9XAabdb9S/agT2Q8w4g=
-golang.org/x/net v0.0.0-20211112202133-69e39bad7dc2 h1:CIJ76btIcR3eFI5EgSo6k1qKw9KJexJuRLI9G7Hp5wE=
+golang.org/x/net v0.0.0-20220617184016-355a448f1bc9/go.mod h1:XRhObCWvk6IyKnWLug+ECip1KBveYUHfp+8e9klMJ9c=
+golang.org/x/sys v0.0.0-20220615213510-4f61da869c0c/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
+google.golang.org/api v0.85.0/go.mod h1:AqZf8Ep9uZ2pyTvgL+x0D3Zt0eoT9b5E8fmzfu6FO2g=
+google.golang.org/genproto v0.0.0-20220617124728-180714bec0ad/go.mod h1:KEWEmljWE5zPzLBa/oHl6DaEt9LmfH6WtH1OHIvleBA=
