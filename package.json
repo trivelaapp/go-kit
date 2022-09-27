@@ -5,7 +5,7 @@
         "@semantic-release/commit-analyzer": "^9.0.2",
         "@semantic-release/github": "^8.0.4",
         "@semantic-release/release-notes-generator": "^10.0.3",
-        "lerna": "^4.0.0",
+        "lerna": "^5.5.2",
         "semantic-release": "^19.0.2",
         "semantic-release-monorepo": "^7.0.5"
     }
