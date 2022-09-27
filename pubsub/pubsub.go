@@ -14,17 +14,17 @@ import (
 const TraceIDContextKey string = "trace_id"
 
 // PubSubClientParams encapsulates the necessary params to build a PubSubClient.
-type PubSubClientParams[T json.Marshaler] struct {
+type PubSubClientParams[T any] struct {
 	Topic Publisher
 }
 
 // PubSubClient is a client of Google Pubsub topic with schema of type T.
-type PubSubClient[T json.Marshaler] struct {
+type PubSubClient[T any] struct {
 	topic Publisher
 }
 
 // NewPubSubClient creates a new PubSubClient instance.
-func NewPubSubClient[T json.Marshaler](params *PubSubClientParams[T]) (*PubSubClient[T], error) {
+func NewPubSubClient[T any](params *PubSubClientParams[T]) (*PubSubClient[T], error) {
 	if params.Topic == nil {
 		return nil, errors.NewMissingRequiredDependency("Topic")
 	}
@@ -34,7 +34,7 @@ func NewPubSubClient[T json.Marshaler](params *PubSubClientParams[T]) (*PubSubCl
 
 // MustNewPubSubClient creates a new PubSubClient instance.
 // It panics if any error is found.
-func MustNewPubSubClient[T json.Marshaler](params *PubSubClientParams[T]) *PubSubClient[T] {
+func MustNewPubSubClient[T any](params *PubSubClientParams[T]) *PubSubClient[T] {
 	s, err := NewPubSubClient(params)
 	if err != nil {
 		panic(err)
@@ -44,7 +44,7 @@ func MustNewPubSubClient[T json.Marshaler](params *PubSubClientParams[T]) *PubSu
 }
 
 // PublishInput is the input for publishing data into a topic with schema of type T.
-type PublishInput[T json.Marshaler] struct {
+type PublishInput[T any] struct {
 	Data       T
 	Attributes map[string]string
 }
@@ -56,7 +56,7 @@ func (c PubSubClient[T]) Publish(ctx context.Context, in ...PublishInput[T]) []e
 	traceID := getTraceID(trace.SpanFromContext(ctx))
 
 	for _, message := range in {
-		data, err := message.Data.MarshalJSON()
+		data, err := json.Marshal(message.Data)
 		if err != nil {
 			errs = append(errs, err)
 			continue
