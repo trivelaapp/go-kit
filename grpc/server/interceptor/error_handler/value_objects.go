@@ -22,6 +22,8 @@ func kindToGRPCStatusCode(kind errors.KindType) codes.Code {
 		return codes.Unknown
 	case errors.KindInternal:
 		return codes.Internal
+	case errors.KindResourceExhausted:
+		return codes.ResourceExhausted
 	default:
 		return codes.Unknown
 	}
