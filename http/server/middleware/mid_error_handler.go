@@ -117,6 +117,8 @@ func kindToHTTPStatusCode(kind errors.KindType) int {
 		return http.StatusInternalServerError
 	case errors.KindInternal:
 		return http.StatusInternalServerError
+	case errors.KindResourceExhausted:
+		return http.StatusTooManyRequests
 	default:
 		return http.StatusInternalServerError
 	}

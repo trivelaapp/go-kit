@@ -26,7 +26,7 @@ type CustomError struct {
 const (
 	// CodeUnknown is the default code returned when the application doesn't attach any code into the error.
 	CodeUnknown CodeType = "UNKNOWN"
-	// KindUnexpected is the default kind returned  when the application doesn't attach any kind into the error.
+	// KindUnexpected is the default kind returned when the application doesn't attach any kind into the error.
 	KindUnexpected KindType = "UNEXPECTED"
 	// KindConflict are errors caused by requests with data that conflicts with the current state of the system.
 	KindConflict KindType = "CONFLICT"
@@ -36,10 +36,12 @@ const (
 	KindInvalidInput KindType = "INVALID_INPUT"
 	// KindNotFound are errors caused by any required resources that not exists on the data repository.
 	KindNotFound KindType = "NOT_FOUND"
-	// KindUnauthentication are errors caused by an unauthenticated call.
+	// KindUnauthenticated are errors caused by an unauthenticated call.
 	KindUnauthenticated KindType = "UNAUTHENTICATED"
 	// KindUnauthorized are errors caused by an unauthorized call.
 	KindUnauthorized KindType = "UNAUTHORIZED"
+	// KindResourceExhausted indicates some resource has been exhausted, perhaps a per-user quota, or perhaps the entire file system is out of space.
+	KindResourceExhausted KindType = "RESOURCE_EXHAUSTED"
 )
 
 // New returns a new instance of CustomError with the given message.
