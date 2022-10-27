@@ -59,6 +59,11 @@ func NewMissingRequiredDependency(name string) error {
 	return New("Missing required dependency: %s", name).WithKind(KindInvalidInput).WithCode("MISSING_REQUIRED_DEPENDENCY")
 }
 
+// NewValidationError creates a Validation error.
+func NewValidationError(desc string) error {
+	return New(desc).WithKind(KindInvalidInput).WithCode("VALIDATION_ERROR")
+}
+
 // WithKind return a copy of the CustomError with the given KindType filled.
 func (ce CustomError) WithKind(kind KindType) CustomError {
 	ce.kind = kind

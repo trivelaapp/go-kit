@@ -90,6 +90,24 @@ func TestNewMissingRequiredDependency(t *testing.T) {
 	})
 }
 
+func TestNewValidationError(t *testing.T) {
+	t.Run("should produce a validation error", func(t *testing.T) {
+		err := errors.NewValidationError("missing required field")
+
+		if err.Error() != "missing required field" {
+			t.Errorf("Wrong error message, got: %s", err.Error())
+		}
+
+		if errors.Kind(err) != errors.KindInvalidInput {
+			t.Errorf("Wrong error kind, got: %s", errors.Kind(err))
+		}
+
+		if errors.Code(err) != errors.CodeType("VALIDATION_ERROR") {
+			t.Errorf("Wrong error code, got: %s", errors.Code(err))
+		}
+	})
+}
+
 func TestKind(t *testing.T) {
 	tt := []struct {
 		name         string
